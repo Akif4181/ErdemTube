@@ -39,12 +39,34 @@
 </div>
 
 <script>
-    // En sağlam ve stabil Piped API sunucuları
-    const PIPED_SERVERS = [
-        "https://pipedapi.kavin.rocks",
-        "https://pipedapi.privacy.com.de",
-        "https://api.piped.privacydev.net"
+    // Tarayıcı engelini (CORS) aşmak için proxy köprüleri ve API uçları
+    const PROXIES = [
+        "https://corsproxy.io/?",
+        "https://api.allorigins.win/raw?url="
     ];
+
+    const API_ENDPOINTS = [
+        "https://pipedapi.kavin.rocks",
+        "https://api.piped.privacydev.net",
+        "https://pipedapi.privacy.com.de"
+    ];
+
+    async function safeFetch(url) {
+        // Önce doğrudan dene
+        try {
+            const res = await fetch(url);
+            if (res.ok) return await res.json();
+        } catch (e) {}
+
+        // Doğrudan istek başarısız olursa Proxy üzerinden geçirmeyi dene
+        for (let proxy of PROXIES) {
+            try {
+                const res = await fetch(proxy + encodeURIComponent(url));
+                if (res.ok) return await res.json();
+            } catch (e) {}
+        }
+        throw new Error("Tüm bağlantı yolları tıkandı.");
+    }
 
     async function videoAra() {
         const query = document.getElementById('searchInput').value.trim();
@@ -52,32 +74,29 @@
 
         const resultsDiv = document.getElementById('results');
         const statusText = document.getElementById('statusText');
-        resultsDiv.innerHTML = "<p>Videolar aranıyor...</p>";
+        resultsDiv.innerHTML = "<p>Videolar aranıyor, lütfen bekleyin...</p>";
         statusText.innerText = "";
 
         let success = false;
 
-        for (let server of PIPED_SERVERS) {
+        for (let baseUrl of API_ENDPOINTS) {
             try {
-                const res = await fetch(`${server}/search?q=${encodeURIComponent(query)}&filter=videos`);
-                if (!res.ok) continue;
-
-                const data = await res.json();
-                const items = data.items || data; // Piped yapısına göre güvenli veri alımı
+                const targetUrl = `${baseUrl}/search?q=${encodeURIComponent(query)}&filter=videos`;
+                const data = await safeFetch(targetUrl);
+                const items = data.items || data;
 
                 if (items && items.length > 0) {
                     resultsDiv.innerHTML = "";
                     items.forEach(item => {
-                        // URL'den video ID'sini ayıkla (/watch?v=ABCDE formatından)
                         const videoId = item.url ? item.url.split('v=')[1] : item.videoId;
                         if (!videoId) return;
 
                         const title = item.title || "İsimsiz Video";
-                        const uploader = item.uploaderName || item.uploader || "Bilinmeyen Kanal";
+                        const uploader = item.uploaderName || item.uploader || "Kanal";
                         const thumbnail = item.thumbnail || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
                         resultsDiv.innerHTML += `
-                            <div class="card" onclick="videoAc('${server}', '${videoId}')">
+                            <div class="card" onclick="videoAc('${baseUrl}', '${videoId}')">
                                 <img src="${thumbnail}" loading="lazy">
                                 <h4>${title}</h4>
                                 <p>${uploader}</p>
@@ -90,17 +109,17 @@
                     break;
                 }
             } catch (err) {
-                console.log(`${server} hata verdi, sonrakine geçiliyor...`);
+                console.log(`${baseUrl} üzerinden veri çekilemedi...`);
             }
         }
 
         if (!success) {
-            resultsDiv.innerHTML = "<p>Arama sırasında bir hata oluştu, lütfen tekrar dene reis!</p>";
+            resultsDiv.innerHTML = "<p>Sunucular şu an yanıt vermiyor, birazdan tekrar dene reis!</p>";
             statusText.innerText = "";
         }
     }
 
-    async function videoAc(server, id) {
+    async function videoAc(baseUrl, id) {
         const modal = document.getElementById('playerModal');
         const player = document.getElementById('videoPlayer');
         const statusText = document.getElementById('statusText');
@@ -108,10 +127,9 @@
         statusText.innerText = "Video hazırlanıyor...";
 
         try {
-            const res = await fetch(`${server}/streams/${id}`);
-            const data = await res.json();
+            const targetUrl = `${baseUrl}/streams/${id}`;
+            const data = await safeFetch(targetUrl);
             
-            // Piped üzerindeki en iyi mp4 video akış linkini bul
             let videoUrl = "";
             if (data.videoStreams && data.videoStreams.length > 0) {
                 const mp4Stream = data.videoStreams.find(s => s.format === 'MPEG_4' && s.url);
@@ -123,10 +141,10 @@
                 modal.style.display = 'flex';
                 statusText.innerText = "";
             } else {
-                alert("Bu videonun akış linki bulunamadı!");
+                alert("Bu videonun oynatma linki alınamadı!");
             }
         } catch (err) {
-            alert("Video açılırken bir sorun oluştu!");
+            alert("Video yüklenirken hata oluştu!");
             statusText.innerText = "";
         }
     }
