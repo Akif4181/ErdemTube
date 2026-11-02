@@ -10,13 +10,14 @@
         input { width: 60%; padding: 12px; font-size: 16px; border-radius: 8px; border: none; outline: none; }
         button { padding: 12px 20px; font-size: 16px; border-radius: 8px; border: none; background: #ff0000; color: white; cursor: pointer; font-weight: bold; }
         button:hover { background: #cc0000; }
+        .status { margin-top: 10px; font-size: 13px; color: #888; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
         .card { background: #1e1e1e; padding: 10px; border-radius: 8px; text-align: left; cursor: pointer; transition: 0.2s; }
         .card:hover { transform: scale(1.03); }
-        .card img { width: 100%; border-radius: 6px; }
+        .card img { width: 100%; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover; }
         .card h4 { font-size: 14px; margin: 10px 0 5px 0; color: #fff; line-height: 1.4; height: 40px; overflow: hidden; }
         .card p { font-size: 12px; color: #aaa; margin: 0; }
-        #playerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; }
+        #playerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; z-index: 999; }
         video { width: 80%; max-width: 800px; border-radius: 8px; }
         .close-btn { margin-top: 15px; background: #555; }
     </style>
@@ -25,8 +26,9 @@
 
 <div class="container">
     <h1>🔴 ErdemTube</h1>
-    <input type="text" id="searchInput" placeholder="Ne izlemek istiyorsun?">
+    <input type="text" id="searchInput" placeholder="Ne izlemek istiyorsun?" onkeypress="if(event.key==='Enter') videoAra()">
     <button onclick="videoAra()">Ara</button>
+    <div id="statusText" class="status"></div>
 
     <div class="grid" id="results"></div>
 </div>
@@ -37,62 +39,108 @@
 </div>
 
 <script>
-    // Genişletilmiş Invidious Sunucu Listesi (Yedekli sistem)
+    // En stabil çalışan güncel Invidious sunucuları
     const SERVERS = [
+        "https://inv.nadeko.net",
         "https://invidious.nerdvpn.de",
-        "https://inv.tux.pizza",
-        "https://invidious.drgns.space",
         "https://invidious.privacydev.net",
         "https://vid.priv.au",
-        "https://invidious.slipfox.xyz",
-        "https://inv.nadeko.net"
+        "https://inv.tux.pizza"
     ];
-    let activeServer = SERVERS[0];
 
-    async function videoAra() {
-        const query = document.getElementById('searchInput').value;
-        if (!query) return;
-
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = "<p>Videolar aranıyor...</p>";
-
+    // Zaman aşımı (Timeout) koyan yardımcı fonksiyon (5 saniye yanıt vermezse iptal eder)
+    async function fetchWithTimeout(resource, options = {}) {
+        const { timeout = 5000 } = options;
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
         try {
-            const res = await fetch(`${activeServer}/api/v1/search?q=${encodeURIComponent(query)}`);
-            const data = await res.json();
-            
-            resultsDiv.innerHTML = "";
-            data.forEach(item => {
-                if(item.type === "video") {
-                    resultsDiv.innerHTML += `
-                        <div class="card" onclick="videoAc('${item.videoId}')">
-                            <img src="${item.videoThumbnails ? item.videoThumbnails[0].url : 'https://img.youtube.com/vi/'+item.videoId+'/hqdefault.jpg'}">
-                            <h4>${item.title}</h4>
-                            <p>${item.author}</p>
-                        </div>
-                    `;
-                }
-            });
+            const response = await fetch(resource, { ...options, signal: controller.signal });
+            clearTimeout(id);
+            return response;
         } catch (err) {
-            resultsDiv.innerHTML = "<p>Aktif sunucu yoğun, sıradakine geçiliyor... Tekrar 'Ara' butonuna bas reis!</p>";
-            // Sunucu patladıysa listedeki bir sonraki sunucuya geç
-            activeServer = SERVERS[(SERVERS.indexOf(activeServer) + 1) % SERVERS.length];
+            clearTimeout(id);
+            throw err;
         }
     }
 
-    async function videoAc(id) {
+    async function videoAra() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) return;
+
+        const resultsDiv = document.getElementById('results');
+        const statusText = document.getElementById('statusText');
+        resultsDiv.innerHTML = "";
+        
+        let success = false;
+
+        // Bütün sunucuları sırayla otomatike dene
+        for (let i = 0; i < SERVERS.length; i++) {
+            const server = SERVERS[i];
+            statusText.innerText = `Sunucu aranıyor (${i + 1}/${SERVERS.length})...`;
+
+            try {
+                const res = await fetchWithTimeout(`${server}/api/v1/search?q=${encodeURIComponent(query)}`, { timeout: 4000 });
+                if (!res.ok) throw new Error("Sunucu yanıtı hatalı");
+                
+                const data = await res.json();
+                
+                resultsDiv.innerHTML = "";
+                let count = 0;
+                data.forEach(item => {
+                    if(item.type === "video") {
+                        count++;
+                        resultsDiv.innerHTML += `
+                            <div class="card" onclick="videoAc('${server}', '${item.videoId}')">
+                                <img src="https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg" loading="lazy">
+                                <h4>${item.title}</h4>
+                                <p>${item.author}</p>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (count > 0) {
+                    statusText.innerText = `Bağlandı: ${server.replace('https://', '')}`;
+                    success = true;
+                    break; // Çalışan sunucu bulundu, döngüden çık
+                }
+            } catch (err) {
+                console.log(`${server} yanıt vermedi, sonraki deneniyor...`);
+            }
+        }
+
+        if (!success) {
+            statusText.innerText = "Şu an tüm sunucular yoğun, 5-10 saniye sonra tekrar Ara butonuna bas reis!";
+        }
+    }
+
+    async function videoAc(server, id) {
         const modal = document.getElementById('playerModal');
         const player = document.getElementById('videoPlayer');
+        const statusText = document.getElementById('statusText');
         
+        statusText.innerText = "Video bağlantısı alınıyor...";
+
         try {
-            const res = await fetch(`${activeServer}/api/v1/videos/${id}`);
+            const res = await fetchWithTimeout(`${server}/api/v1/videos/${id}`, { timeout: 6000 });
             const data = await res.json();
             
-            const format = data.formatStreams.find(f => f.container === 'mp4') || data.formatStreams[0];
-            
-            player.src = format.url;
-            modal.style.display = 'flex';
+            // Çalışan video linkini bul
+            let videoUrl = "";
+            if (data.formatStreams && data.formatStreams.length > 0) {
+                const mp4 = data.formatStreams.find(f => f.container === 'mp4');
+                videoUrl = mp4 ? mp4.url : data.formatStreams[0].url;
+            }
+
+            if (videoUrl) {
+                player.src = videoUrl;
+                modal.style.display = 'flex';
+                statusText.innerText = "";
+            } else {
+                alert("Bu videonun oynatma linki alınamadı, başka bir video dene!");
+            }
         } catch (err) {
-            alert("Video açılırken sunucu yanıt vermedi, başka bir video dene!");
+            alert("Video açılırken sunucu zaman aşımına uğradı, tekrar tıklamayı dene!");
         }
     }
 
