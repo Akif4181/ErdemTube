@@ -10,13 +10,14 @@
         input { width: 60%; padding: 12px; font-size: 16px; border-radius: 8px; border: none; outline: none; background: #222; color: #fff; }
         button { padding: 12px 20px; font-size: 16px; border-radius: 8px; border: none; background: #ff0000; color: white; cursor: pointer; font-weight: bold; }
         button:hover { background: #cc0000; }
+        .status { margin-top: 10px; font-size: 13px; color: #888; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
         .card { background: #1e1e1e; padding: 10px; border-radius: 8px; text-align: left; cursor: pointer; transition: 0.2s; }
         .card:hover { transform: scale(1.03); }
         .card img { width: 100%; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover; }
         .card h4 { font-size: 14px; margin: 10px 0 5px 0; color: #fff; line-height: 1.4; height: 40px; overflow: hidden; }
-        #playerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; flex-direction: column; z-index: 999; }
-        iframe { width: 85%; height: 70%; max-width: 900px; border: none; border-radius: 12px; }
+        #playerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; z-index: 999; }
+        iframe { width: 80%; height: 60vh; max-width: 800px; border: none; border-radius: 8px; }
         .close-btn { margin-top: 15px; background: #555; }
     </style>
 </head>
@@ -26,12 +27,13 @@
     <h1>🔴 ErdemTube</h1>
     <input type="text" id="searchInput" placeholder="Ne izlemek istiyorsun?" onkeypress="if(event.key==='Enter') videoAra()">
     <button onclick="videoAra()">Ara</button>
+    <div id="statusText" class="status"></div>
 
     <div class="grid" id="results"></div>
 </div>
 
 <div id="playerModal">
-    <iframe id="videoPlayer" src="" allowfullscreen allow="autoplay"></iframe>
+    <iframe id="videoPlayer" allowfullscreen autoplay></iframe>
     <button class="close-btn" onclick="kapatPlayer()">Kapat</button>
 </div>
 
@@ -41,37 +43,88 @@
         if (!query) return;
 
         const resultsDiv = document.getElementById('results');
+        const statusText = document.getElementById('statusText');
         resultsDiv.innerHTML = "<p>Videolar getiriliyor...</p>";
+        statusText.innerText = "";
 
         try {
-            // YouTube arama önerileri ve video aramasını doğrudan çözen CORS proxy hattı
+            // YouTube Autocomplete API üzerinden doğrudan arama terimlerini ve videoları çekiyoruz
+            const res = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=videos`);
+            const data = await res.json();
+
+            if (data.items && data.items.length > 0) {
+                resultsDiv.innerHTML = "";
+                data.items.forEach(item => {
+                    const videoId = item.url ? item.url.split('v=')[1] : item.videoId;
+                    if (!videoId) return;
+
+                    resultsDiv.innerHTML += `
+                        <div class="card" onclick="videoAc('${videoId}')">
+                            <img src="https://i.ytimg.com/vi/${videoId}/hqdefault.jpg" loading="lazy">
+                            <h4>${item.title}</h4>
+                        </div>
+                    `;
+                });
+                statusText.innerText = "Videolar yüklendi!";
+            } else {
+                throw new Error("Veri yok");
+            }
+        } catch (err) {
+            // Alternatif motor: Doğrudan invidious embed arama yedeği
+            resultsDiv.innerHTML = "<p>Arama sonuçları alınıyor...</p>";
+            ytAramaYedek(query);
+        }
+    }
+
+    async function ytAramaYedek(query) {
+        const resultsDiv = document.getElementById('results');
+        try {
             const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.youtube.com/results?search_query=' + query)}`);
             const data = await res.json();
             
-            // YouTube sayfasındaki video ID'lerini ve başlıklarını yakala
-            const matches = [...data.contents.matchAll(/"videoId":"([^"]+)".*?"title":{"runs":\[{"text":"([^"]+)"}/g)];
-
+            // HTML içinden video ID ve başlıklarını kazı (Scraping)
+            const matches = [...data.contents.matchAll(/"videoId":"([^"]+)","thumbnail":\{"thumbnails":\[\{"url":"[^"]+"\}\],"title":\{"runs":\[\{"text":"([^"]+)"\}/g)];
+            
             if (matches.length > 0) {
                 resultsDiv.innerHTML = "";
-                const addedIds = new Set();
-
-                for (let match of matches) {
-                    const id = match[1];
-                    const title = match[2];
-
-                    if (!addedIds.has(id)) {
-                        addedIds.add(id);
+                const eklenenler = new Set();
+                
+                matches.forEach(m => {
+                    const id = m[1];
+                    const baslik = m[2];
+                    if(!eklenenler.has(id) && id.length === 11) {
+                        eklenenler.add(id);
                         resultsDiv.innerHTML += `
                             <div class="card" onclick="videoAc('${id}')">
                                 <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" loading="lazy">
-                                <h4>${title}</h4>
+                                <h4>${baslik}</h4>
                             </div>
                         `;
                     }
-                    if (addedIds.size >= 12) break; // İlk 12 videoyu getir
-                }
+                });
             } else {
-                resultsDiv.innerHTML = "<p>Sonuç bulunamadı, farklı bir arama yap reis!</p>";
+                resultsDiv.innerHTML = "<p>Arama yapılırken hata oluştu, lütfen farklı bir kelime dene.</p>";
             }
-        } catch (err) {
-            resultsDiv.innerHTML = "<p>Arama yapılırken bir hata oluştu.
+        } catch(e) {
+            resultsDiv.innerHTML = "<p>Bağlantı kurulamadı.</p>";
+        }
+    }
+
+    function videoAc(id) {
+        const modal = document.getElementById('playerModal');
+        const player = document.getElementById('videoPlayer');
+        // Reklamsız ve Invidious tarzı izleme için youtube-nocookie kullanıyoruz
+        player.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+        modal.style.display = 'flex';
+    }
+
+    function kapatPlayer() {
+        const modal = document.getElementById('playerModal');
+        const player = document.getElementById('videoPlayer');
+        player.src = "";
+        modal.style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
