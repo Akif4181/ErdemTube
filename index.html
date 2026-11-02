@@ -44,15 +44,15 @@
 </div>
 
 <script>
-    // SADECE BURADAKİ TIRNAKLARIN ARASINA BİR DEFA YAPIŞTIR:
-    const API_KEY = "AIzaSyAqZ0dcg7MPQmeN3YoNbcpo7fMBg-Q8Wzs";
+    // TEK VE SON - ANAHTARINI BURAYA YAPIŞTIR:
+    const API_KEY = "BURAYA_YAPIŞTIR";
 
     async function videoAra() {
         const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
 
-        if (API_KEY === "BURAYA_API_KEYINIZI_YAPISTIRIN" || API_KEY === "") {
-            alert("Lütfen koddaki API_KEY tırnaklarının arasına kendi Google API Key'ini ekle!");
+        if (API_KEY === "BURAYA_YAPIŞTIR" || API_KEY === "") {
+            alert("Reis API anahtarını koddaki 'BURAYA_YAPIŞTIR' yerine yazmamışsın!");
             return;
         }
 
@@ -102,7 +102,6 @@
         const modal = document.getElementById('playerModal');
         const player = document.getElementById('videoPlayer');
         
-        // Reklamsız No-Cookie Oynatıcı
         player.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
         modal.style.display = 'flex';
     }
