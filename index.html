@@ -44,17 +44,12 @@
 </div>
 
 <script>
-    // TEK VE SON - ANAHTARINI BURAYA YAPIŞTIR:
+    // ANAHTARINI BURAYA YAPIŞTIR (Tırnakları silme, sadece içini değiştir):
     const API_KEY = "BURAYA_YAPIŞTIR";
 
     async function videoAra() {
         const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
-
-        if (API_KEY === "BURAYA_YAPIŞTIR" || API_KEY === "") {
-            alert("Reis API anahtarını koddaki 'BURAYA_YAPIŞTIR' yerine yazmamışsın!");
-            return;
-        }
 
         const resultsDiv = document.getElementById('results');
         const statusText = document.getElementById('statusText');
