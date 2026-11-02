@@ -10,15 +10,13 @@
         input { width: 60%; padding: 12px; font-size: 16px; border-radius: 8px; border: none; outline: none; background: #222; color: #fff; }
         button { padding: 12px 20px; font-size: 16px; border-radius: 8px; border: none; background: #ff0000; color: white; cursor: pointer; font-weight: bold; }
         button:hover { background: #cc0000; }
-        .status { margin-top: 10px; font-size: 13px; color: #888; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
         .card { background: #1e1e1e; padding: 10px; border-radius: 8px; text-align: left; cursor: pointer; transition: 0.2s; }
         .card:hover { transform: scale(1.03); }
         .card img { width: 100%; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover; }
         .card h4 { font-size: 14px; margin: 10px 0 5px 0; color: #fff; line-height: 1.4; height: 40px; overflow: hidden; }
-        .card p { font-size: 12px; color: #aaa; margin: 0; }
-        #playerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; z-index: 999; }
-        video { width: 80%; max-width: 800px; border-radius: 8px; }
+        #playerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; flex-direction: column; z-index: 999; }
+        iframe { width: 85%; height: 70%; max-width: 900px; border: none; border-radius: 12px; }
         .close-btn { margin-top: 15px; background: #555; }
     </style>
 </head>
@@ -28,135 +26,52 @@
     <h1>🔴 ErdemTube</h1>
     <input type="text" id="searchInput" placeholder="Ne izlemek istiyorsun?" onkeypress="if(event.key==='Enter') videoAra()">
     <button onclick="videoAra()">Ara</button>
-    <div id="statusText" class="status"></div>
 
     <div class="grid" id="results"></div>
 </div>
 
 <div id="playerModal">
-    <video id="videoPlayer" controls autoplay></video>
+    <iframe id="videoPlayer" src="" allowfullscreen allow="autoplay"></iframe>
     <button class="close-btn" onclick="kapatPlayer()">Kapat</button>
 </div>
 
 <script>
-    // Tarayıcı engelini (CORS) aşmak için proxy köprüleri ve API uçları
-    const PROXIES = [
-        "https://corsproxy.io/?",
-        "https://api.allorigins.win/raw?url="
-    ];
-
-    const API_ENDPOINTS = [
-        "https://pipedapi.kavin.rocks",
-        "https://api.piped.privacydev.net",
-        "https://pipedapi.privacy.com.de"
-    ];
-
-    async function safeFetch(url) {
-        // Önce doğrudan dene
-        try {
-            const res = await fetch(url);
-            if (res.ok) return await res.json();
-        } catch (e) {}
-
-        // Doğrudan istek başarısız olursa Proxy üzerinden geçirmeyi dene
-        for (let proxy of PROXIES) {
-            try {
-                const res = await fetch(proxy + encodeURIComponent(url));
-                if (res.ok) return await res.json();
-            } catch (e) {}
-        }
-        throw new Error("Tüm bağlantı yolları tıkandı.");
-    }
-
     async function videoAra() {
         const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
 
         const resultsDiv = document.getElementById('results');
-        const statusText = document.getElementById('statusText');
-        resultsDiv.innerHTML = "<p>Videolar aranıyor, lütfen bekleyin...</p>";
-        statusText.innerText = "";
-
-        let success = false;
-
-        for (let baseUrl of API_ENDPOINTS) {
-            try {
-                const targetUrl = `${baseUrl}/search?q=${encodeURIComponent(query)}&filter=videos`;
-                const data = await safeFetch(targetUrl);
-                const items = data.items || data;
-
-                if (items && items.length > 0) {
-                    resultsDiv.innerHTML = "";
-                    items.forEach(item => {
-                        const videoId = item.url ? item.url.split('v=')[1] : item.videoId;
-                        if (!videoId) return;
-
-                        const title = item.title || "İsimsiz Video";
-                        const uploader = item.uploaderName || item.uploader || "Kanal";
-                        const thumbnail = item.thumbnail || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-
-                        resultsDiv.innerHTML += `
-                            <div class="card" onclick="videoAc('${baseUrl}', '${videoId}')">
-                                <img src="${thumbnail}" loading="lazy">
-                                <h4>${title}</h4>
-                                <p>${uploader}</p>
-                            </div>
-                        `;
-                    });
-
-                    statusText.innerText = "Bağlantı başarılı!";
-                    success = true;
-                    break;
-                }
-            } catch (err) {
-                console.log(`${baseUrl} üzerinden veri çekilemedi...`);
-            }
-        }
-
-        if (!success) {
-            resultsDiv.innerHTML = "<p>Sunucular şu an yanıt vermiyor, birazdan tekrar dene reis!</p>";
-            statusText.innerText = "";
-        }
-    }
-
-    async function videoAc(baseUrl, id) {
-        const modal = document.getElementById('playerModal');
-        const player = document.getElementById('videoPlayer');
-        const statusText = document.getElementById('statusText');
-        
-        statusText.innerText = "Video hazırlanıyor...";
+        resultsDiv.innerHTML = "<p>Videolar getiriliyor...</p>";
 
         try {
-            const targetUrl = `${baseUrl}/streams/${id}`;
-            const data = await safeFetch(targetUrl);
+            // YouTube arama önerileri ve video aramasını doğrudan çözen CORS proxy hattı
+            const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.youtube.com/results?search_query=' + query)}`);
+            const data = await res.json();
             
-            let videoUrl = "";
-            if (data.videoStreams && data.videoStreams.length > 0) {
-                const mp4Stream = data.videoStreams.find(s => s.format === 'MPEG_4' && s.url);
-                videoUrl = mp4Stream ? mp4Stream.url : data.videoStreams[0].url;
-            }
+            // YouTube sayfasındaki video ID'lerini ve başlıklarını yakala
+            const matches = [...data.contents.matchAll(/"videoId":"([^"]+)".*?"title":{"runs":\[{"text":"([^"]+)"}/g)];
 
-            if (videoUrl) {
-                player.src = videoUrl;
-                modal.style.display = 'flex';
-                statusText.innerText = "";
+            if (matches.length > 0) {
+                resultsDiv.innerHTML = "";
+                const addedIds = new Set();
+
+                for (let match of matches) {
+                    const id = match[1];
+                    const title = match[2];
+
+                    if (!addedIds.has(id)) {
+                        addedIds.add(id);
+                        resultsDiv.innerHTML += `
+                            <div class="card" onclick="videoAc('${id}')">
+                                <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" loading="lazy">
+                                <h4>${title}</h4>
+                            </div>
+                        `;
+                    }
+                    if (addedIds.size >= 12) break; // İlk 12 videoyu getir
+                }
             } else {
-                alert("Bu videonun oynatma linki alınamadı!");
+                resultsDiv.innerHTML = "<p>Sonuç bulunamadı, farklı bir arama yap reis!</p>";
             }
         } catch (err) {
-            alert("Video yüklenirken hata oluştu!");
-            statusText.innerText = "";
-        }
-    }
-
-    function kapatPlayer() {
-        const modal = document.getElementById('playerModal');
-        const player = document.getElementById('videoPlayer');
-        player.pause();
-        player.src = "";
-        modal.style.display = 'none';
-    }
-</script>
-
-</body>
-</html>
+            resultsDiv.innerHTML = "<p>Arama yapılırken bir hata oluştu.
