@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ErdemTube</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; text-align: center; }
+        input { width: 60%; padding: 12px; font-size: 16px; border-radius: 8px; border: none; outline: none; }
+        button { padding: 12px 20px; font-size: 16px; border-radius: 8px; border: none; background: #ff0000; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #cc0000; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
+        .card { background: #1e1e1e; padding: 10px; border-radius: 8px; text-align: left; cursor: pointer; transition: 0.2s; }
+        .card:hover { transform: scale(1.03); }
+        .card img { width: 100%; border-radius: 6px; }
+        .card h4 { font-size: 14px; margin: 10px 0 5px 0; color: #fff; line-height: 1.4; height: 40px; overflow: hidden; }
+        .card p { font-size: 12px; color: #aaa; margin: 0; }
+        #playerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; }
+        video { width: 80%; max-width: 800px; border-radius: 8px; }
+        .close-btn { margin-top: 15px; background: #555; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔴 ErdemTube</h1>
+    <input type="text" id="searchInput" placeholder="Ne izlemek istiyorsun?">
+    <button onclick="videoAra()">Ara</button>
+
+    <div class="grid" id="results"></div>
+</div>
+
+<div id="playerModal">
+    <video id="videoPlayer" controls autoplay></video>
+    <button class="close-btn" onclick="kapatPlayer()">Kapat</button>
+</div>
+
+<script>
+    // Genişletilmiş Invidious Sunucu Listesi (Yedekli sistem)
+    const SERVERS = [
+        "https://invidious.nerdvpn.de",
+        "https://inv.tux.pizza",
+        "https://invidious.drgns.space",
+        "https://invidious.privacydev.net",
+        "https://vid.priv.au",
+        "https://invidious.slipfox.xyz",
+        "https://inv.nadeko.net"
+    ];
+    let activeServer = SERVERS[0];
+
+    async function videoAra() {
+        const query = document.getElementById('searchInput').value;
+        if (!query) return;
+
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = "<p>Videolar aranıyor...</p>";
+
+        try {
+            const res = await fetch(`${activeServer}/api/v1/search?q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            
+            resultsDiv.innerHTML = "";
+            data.forEach(item => {
+                if(item.type === "video") {
+                    resultsDiv.innerHTML += `
+                        <div class="card" onclick="videoAc('${item.videoId}')">
+                            <img src="${item.videoThumbnails ? item.videoThumbnails[0].url : 'https://img.youtube.com/vi/'+item.videoId+'/hqdefault.jpg'}">
+                            <h4>${item.title}</h4>
+                            <p>${item.author}</p>
+                        </div>
+                    `;
+                }
+            });
+        } catch (err) {
+            resultsDiv.innerHTML = "<p>Aktif sunucu yoğun, sıradakine geçiliyor... Tekrar 'Ara' butonuna bas reis!</p>";
+            // Sunucu patladıysa listedeki bir sonraki sunucuya geç
+            activeServer = SERVERS[(SERVERS.indexOf(activeServer) + 1) % SERVERS.length];
+        }
+    }
+
+    async function videoAc(id) {
+        const modal = document.getElementById('playerModal');
+        const player = document.getElementById('videoPlayer');
+        
+        try {
+            const res = await fetch(`${activeServer}/api/v1/videos/${id}`);
+            const data = await res.json();
+            
+            const format = data.formatStreams.find(f => f.container === 'mp4') || data.formatStreams[0];
+            
+            player.src = format.url;
+            modal.style.display = 'flex';
+        } catch (err) {
+            alert("Video açılırken sunucu yanıt vermedi, başka bir video dene!");
+        }
+    }
+
+    function kapatPlayer() {
+        const modal = document.getElementById('playerModal');
+        const player = document.getElementById('videoPlayer');
+        player.pause();
+        player.src = "";
+        modal.style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
