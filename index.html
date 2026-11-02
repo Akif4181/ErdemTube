@@ -44,15 +44,15 @@
 </div>
 
 <script>
-    // BURAYA GOOGLE CONSOLE'DAN ALDIĞIN API KEY'I YAPIŞTIR:
+    // SADECE BURADAKİ TIRNAKLARIN ARASINA BİR DEFA YAPIŞTIR:
     const API_KEY = "AIzaSyAqZ0dcg7MPQmeN3YoNbcpo7fMBg-Q8Wzs";
 
     async function videoAra() {
         const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
 
-        if (API_KEY === "AIzaSyAqZ0dcg7MPQmeN3YoNbcpo7fMBg-Q8Wzs") {
-            alert("Lütfen koddaki API_KEY kısmına kendi Google API Anahtarını yapıştır reis!");
+        if (API_KEY === "BURAYA_API_KEYINIZI_YAPISTIRIN" || API_KEY === "") {
+            alert("Lütfen koddaki API_KEY tırnaklarının arasına kendi Google API Key'ini ekle!");
             return;
         }
 
