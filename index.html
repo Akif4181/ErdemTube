@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101010">
 <title>ErdemTube</title>
 
 <style>
@@ -14,17 +15,17 @@
 }
 
 body {
-    background: #0f0f0f;
-    color: white;
+    background: #101010;
+    color: #fff;
     font-family: Arial, sans-serif;
 }
 
 header {
     height: 70px;
-    background: #171717;
+    background: #181818;
     display: flex;
     align-items: center;
-    padding: 0 5%;
+    padding: 0 4%;
     gap: 30px;
     position: sticky;
     top: 0;
@@ -37,6 +38,7 @@ header {
     font-size: 27px;
     font-weight: 900;
     white-space: nowrap;
+    letter-spacing: -1px;
 }
 
 .logo span {
@@ -53,10 +55,10 @@ header {
 .search input {
     flex: 1;
     min-width: 0;
-    padding: 14px 20px;
     background: #252525;
-    color: white;
     border: 1px solid #444;
+    color: white;
+    padding: 14px 20px;
     border-radius: 30px 0 0 30px;
     outline: none;
     font-size: 15px;
@@ -64,8 +66,8 @@ header {
 
 .search button {
     background: #ff3030;
-    color: white;
     border: none;
+    color: white;
     padding: 0 25px;
     border-radius: 0 30px 30px 0;
     cursor: pointer;
@@ -79,40 +81,42 @@ header {
 }
 
 aside {
-    border-right: 1px solid #292929;
     padding: 25px 12px;
+    border-right: 1px solid #292929;
 }
 
 aside button {
+    display: block;
     width: 100%;
     background: transparent;
-    border: none;
     color: white;
-    text-align: left;
+    border: none;
     padding: 14px;
+    text-align: left;
     border-radius: 9px;
     cursor: pointer;
     font-size: 15px;
 }
 
-aside button:hover {
+aside button:hover,
+aside button.active {
     background: #292929;
 }
 
 main {
-    padding: 25px;
     min-width: 0;
+    padding: 25px;
+}
+
+#heading {
+    font-size: 21px;
+    margin-bottom: 15px;
 }
 
 #status {
     color: #aaa;
-    margin-bottom: 20px;
     font-size: 14px;
-}
-
-#heading {
     margin-bottom: 20px;
-    font-size: 21px;
 }
 
 .videos {
@@ -151,44 +155,93 @@ main {
     margin-top: 6px;
 }
 
+/* INVIDIOUS PLAYER */
+
 #playerSection {
     display: none;
     margin-bottom: 35px;
+    background: #181818;
+    padding: 15px;
+    border-radius: 14px;
+}
+
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 13px;
+    gap: 10px;
+}
+
+.player-label {
+    color: #ff4545;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.close-player {
+    background: #292929;
+    border: none;
+    color: white;
+    padding: 8px 13px;
+    border-radius: 7px;
+    cursor: pointer;
 }
 
 .player {
     width: 100%;
     aspect-ratio: 16/9;
-    background: black;
-    border-radius: 13px;
+    background: #000;
+    border-radius: 12px;
     overflow: hidden;
 }
 
 .player iframe {
     width: 100%;
     height: 100%;
-    border: none;
+    border: 0;
 }
 
 #playerTitle {
-    margin-top: 15px;
     font-size: 21px;
+    margin-top: 16px;
+    line-height: 1.4;
 }
 
 #playerChannel {
     color: #aaa;
-    margin-top: 8px;
+    margin-top: 9px;
+    font-size: 14px;
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.player-info a {
+    color: #ff5555;
+    font-size: 13px;
+    text-decoration: none;
 }
 
 #more {
     display: none;
     margin: 35px auto;
+    padding: 13px 25px;
     background: #ff3030;
     color: white;
     border: none;
-    padding: 13px 25px;
     border-radius: 25px;
     cursor: pointer;
+    font-weight: bold;
+}
+
+#more:disabled {
+    opacity: .5;
 }
 
 footer {
@@ -196,13 +249,14 @@ footer {
     padding: 25px;
     color: #777;
     border-top: 1px solid #292929;
+    font-size: 13px;
 }
 
 @media(max-width:700px) {
     header {
+        height: 60px;
         padding: 0 12px;
         gap: 12px;
-        height: 60px;
     }
 
     .logo {
@@ -222,8 +276,8 @@ footer {
     }
 
     aside button {
-        white-space: nowrap;
         width: auto;
+        white-space: nowrap;
         padding: 10px;
     }
 
@@ -239,15 +293,19 @@ footer {
     .video h3 {
         font-size: 13px;
     }
+
+    #playerSection {
+        padding: 9px;
+    }
+
+    #playerTitle {
+        font-size: 17px;
+    }
 }
 
 @media(max-width:380px) {
     .videos {
         grid-template-columns: 1fr;
-    }
-
-    .logo {
-        font-size: 18px;
     }
 }
 </style>
@@ -260,9 +318,9 @@ footer {
 
     <div class="search">
         <input
-            type="text"
             id="query"
-            placeholder="YouTube'da ara..."
+            type="search"
+            placeholder="Ne izlemek istiyorsun?"
             autocomplete="off"
         >
         <button onclick="search()">ARA</button>
@@ -272,58 +330,98 @@ footer {
 <div class="layout">
 
 <aside>
-    <button onclick="home()">🏠 Ana Sayfa</button>
-    <button onclick="category('müzik')">🎵 Müzik</button>
-    <button onclick="category('oyun')">🎮 Oyun</button>
-    <button onclick="category('teknoloji')">💻 Teknoloji</button>
-    <button onclick="category('komedi')">😂 Komedi</button>
-    <button onclick="category('eğitim')">📚 Eğitim</button>
-    <button onclick="category('spor')">⚽ Spor</button>
+    <button class="active" onclick="home(this)">🏠 Ana Sayfa</button>
+    <button onclick="category('müzik',this)">🎵 Müzik</button>
+    <button onclick="category('oyun',this)">🎮 Oyun</button>
+    <button onclick="category('teknoloji',this)">💻 Teknoloji</button>
+    <button onclick="category('komedi',this)">😂 Komedi</button>
+    <button onclick="category('eğitim',this)">📚 Eğitim</button>
+    <button onclick="category('spor',this)">⚽ Spor</button>
+    <button onclick="category('belgesel',this)">🌍 Belgesel</button>
 </aside>
 
 <main>
 
-<section id="playerSection">
-    <div class="player">
-        <iframe
-            id="player"
-            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-            allowfullscreen
-            referrerpolicy="strict-origin-when-cross-origin">
-        </iframe>
-    </div>
+    <!-- INVIDIOUS VIDEO PLAYER -->
 
-    <h2 id="playerTitle"></h2>
-    <p id="playerChannel"></p>
-</section>
+    <section id="playerSection">
 
-<h2 id="heading">ErdemTube'a Hoş Geldin 👋</h2>
+        <div class="player-header">
+            <span class="player-label">
+                ● ERDEMTUBE INVIDIOUS PLAYER
+            </span>
 
-<p id="status">Videolar yükleniyor...</p>
+            <button class="close-player" onclick="closePlayer()">
+                ✕ Kapat
+            </button>
+        </div>
 
-<div class="videos" id="videos"></div>
+        <div class="player">
+            <iframe
+                id="player"
+                title="ErdemTube Invidious Video Player"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowfullscreen
+                referrerpolicy="no-referrer">
+            </iframe>
+        </div>
 
-<button id="more" onclick="loadMore()">
-    Daha Fazla Video Yükle
-</button>
+        <h2 id="playerTitle"></h2>
+
+        <div class="player-info">
+            <p id="playerChannel"></p>
+
+            <a id="instanceLink"
+               href="https://invidious.tiekoetter.com"
+               target="_blank"
+               rel="noopener noreferrer">
+               Invidious sunucusu ↗
+            </a>
+        </div>
+
+    </section>
+
+    <h2 id="heading">ErdemTube'a Hoş Geldin 👋</h2>
+
+    <p id="status">Videolar yükleniyor...</p>
+
+    <div class="videos" id="videos"></div>
+
+    <button id="more" onclick="loadMore()">
+        Daha Fazla Video Yükle
+    </button>
 
 </main>
 </div>
 
 <footer>
-    © 2026 ErdemTube - İzlemenin Yeni Yolu
+    © 2026 ErdemTube | Independent Video Experience
 </footer>
 
 <script>
 
-// =====================================
-// ERDEMTUBE YOUTUBE API KEY
-// BURAYA KENDİ API KEY'İNİ YAZ!
-// =====================================
+// ======================================
+// ERDEMTUBE API AYARLARI
+// ======================================
+
+// YouTube API Key'ini buraya yaz.
 
 const API_KEY = "AIzaSyAqZ0dcg7MPQmeN3YoNbcpo7fMBg-Q8Wzs";
 
-// =====================================
+// Invidious sunucusu.
+// Resmî listede bulunan bir alternatifle değiştirebilirsin.
+
+const INVIDIOUS_INSTANCE = "https://invidious.tiekoetter.com";
+
+// Diğer resmî listelenmiş alternatifler:
+//
+// https://inv.nadeko.net
+// https://invidious.nerdvpn.de
+// https://yt.chocolatemoo53.com
+// https://invidious.f5.si
+// https://inv.miningtcup.me
+
+// ======================================
 
 let nextToken = "";
 let lastQuery = "";
@@ -331,36 +429,64 @@ let busy = false;
 
 const $ = id => document.getElementById(id);
 
-function home() {
+
+// ANA SAYFA
+
+function home(button) {
+    setActive(button);
     $("query").value = "";
+    closePlayer();
     searchVideos("Türkiye popüler videolar");
 }
 
-function category(name) {
+
+// KATEGORİLER
+
+function category(name, button) {
+    setActive(button);
     $("query").value = name;
+    closePlayer();
     searchVideos(name);
 }
 
-function search() {
-    const query = $("query").value.trim();
 
-    if (!query) {
+// AKTİF MENÜ
+
+function setActive(button) {
+    document.querySelectorAll("aside button").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    if(button) button.classList.add("active");
+}
+
+
+// ARAMA
+
+function search() {
+    const q = $("query").value.trim();
+
+    if (!q) {
         alert("Aramak istediğin videoyu yaz!");
         return;
     }
 
-    searchVideos(query);
+    closePlayer();
+    searchVideos(q);
 }
 
-$("query").addEventListener("keydown", function(e) {
+$("query").addEventListener("keydown", e => {
     if (e.key === "Enter") search();
 });
+
+
+// YOUTUBE API ARAMA
 
 async function searchVideos(query, more = false) {
 
     if (!API_KEY || API_KEY === "BURAYA_API_KEYINI_YAZ") {
         $("status").textContent =
-            "HTML dosyasındaki API_KEY alanına anahtarını yazmalısın.";
+            "HTML dosyasındaki API_KEY alanına kendi anahtarını yazmalısın.";
         return;
     }
 
@@ -374,6 +500,7 @@ async function searchVideos(query, more = false) {
     }
 
     busy = true;
+
     $("status").textContent = "Videolar aranıyor...";
     $("more").style.display = "none";
 
@@ -415,19 +542,20 @@ async function searchVideos(query, more = false) {
 
         data.items.forEach(item => {
 
-            const id = item.id.videoId;
+            const videoId = item.id.videoId;
             const snippet = item.snippet;
 
-            if (!id) return;
+            if (!videoId) return;
 
-            const card = document.createElement("div");
+            const card = document.createElement("article");
             card.className = "video";
 
             const img = document.createElement("img");
 
             img.src =
                 snippet.thumbnails.high?.url ||
-                snippet.thumbnails.medium?.url;
+                snippet.thumbnails.medium?.url ||
+                snippet.thumbnails.default?.url;
 
             img.alt = snippet.title;
             img.loading = "lazy";
@@ -445,15 +573,16 @@ async function searchVideos(query, more = false) {
 
             card.append(img, title, channel, date);
 
-            card.onclick = () => {
+            card.addEventListener("click", () => {
                 playVideo(
-                    id,
+                    videoId,
                     snippet.title,
                     snippet.channelTitle
                 );
-            };
+            });
 
             $("videos").appendChild(card);
+
         });
 
         $("status").textContent =
@@ -462,31 +591,38 @@ async function searchVideos(query, more = false) {
         $("more").style.display =
             nextToken ? "block" : "none";
 
-    } catch (error) {
+    } catch(error) {
 
-        $("status").textContent = "Hata: " + error.message;
         console.error(error);
+
+        $("status").textContent =
+            "Arama hatası: " + error.message;
 
     } finally {
         busy = false;
     }
 }
 
-function loadMore() {
-    if (nextToken) {
-        searchVideos(lastQuery, true);
-    }
-}
+
+// INVIDIOUS OYNATICI
 
 function playVideo(id, title, channel) {
 
-    $("player").src =
-        "https://www.youtube-nocookie.com/embed/" +
+    const base = INVIDIOUS_INSTANCE.replace(/\/+$/, "");
+
+    const playerURL =
+        base +
+        "/embed/" +
         encodeURIComponent(id) +
-        "?autoplay=1";
+        "?autoplay=1&controls=1&dark_mode=true&player_style=invidious";
+
+    $("player").src = playerURL;
 
     $("playerTitle").textContent = title;
     $("playerChannel").textContent = channel;
+
+    $("instanceLink").href = base + "/watch?v=" +
+        encodeURIComponent(id);
 
     $("playerSection").style.display = "block";
 
@@ -496,9 +632,40 @@ function playVideo(id, title, channel) {
     });
 }
 
-// İlk açılışta popüler videoları getir.
+
+// OYNATICIYI KAPAT
+
+function closePlayer() {
+
+    $("player").src = "";
+
+    $("playerSection").style.display = "none";
+}
+
+
+// DAHA FAZLA VİDEO
+
+function loadMore() {
+
+    if (nextToken) {
+        searchVideos(lastQuery, true);
+    }
+}
+
+
+// İLK AÇILIŞ
+
 window.addEventListener("load", () => {
-    searchVideos("Türkiye popüler videolar");
+
+    searchVideos("@yapayzeka_gundemi");
+
+});
+
+
+// SAYFADAN ÇIKARKEN VİDEOYU DURDUR
+
+window.addEventListener("pagehide", () => {
+    $("player").src = "";
 });
 
 </script>
