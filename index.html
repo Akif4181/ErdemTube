@@ -1,674 +1,267 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101010">
-<title>ErdemTube</title>
-
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background: #101010;
-    color: #fff;
-    font-family: Arial, sans-serif;
-}
-
-header {
-    height: 70px;
-    background: #181818;
-    display: flex;
-    align-items: center;
-    padding: 0 4%;
-    gap: 30px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid #292929;
-}
-
-.logo {
-    color: #ff3030;
-    font-size: 27px;
-    font-weight: 900;
-    white-space: nowrap;
-    letter-spacing: -1px;
-}
-
-.logo span {
-    color: white;
-}
-
-.search {
-    display: flex;
-    flex: 1;
-    max-width: 700px;
-    margin: auto;
-}
-
-.search input {
-    flex: 1;
-    min-width: 0;
-    background: #252525;
-    border: 1px solid #444;
-    color: white;
-    padding: 14px 20px;
-    border-radius: 30px 0 0 30px;
-    outline: none;
-    font-size: 15px;
-}
-
-.search button {
-    background: #ff3030;
-    border: none;
-    color: white;
-    padding: 0 25px;
-    border-radius: 0 30px 30px 0;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.layout {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    min-height: calc(100vh - 70px);
-}
-
-aside {
-    padding: 25px 12px;
-    border-right: 1px solid #292929;
-}
-
-aside button {
-    display: block;
-    width: 100%;
-    background: transparent;
-    color: white;
-    border: none;
-    padding: 14px;
-    text-align: left;
-    border-radius: 9px;
-    cursor: pointer;
-    font-size: 15px;
-}
-
-aside button:hover,
-aside button.active {
-    background: #292929;
-}
-
-main {
-    min-width: 0;
-    padding: 25px;
-}
-
-#heading {
-    font-size: 21px;
-    margin-bottom: 15px;
-}
-
-#status {
-    color: #aaa;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-.videos {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 25px;
-}
-
-.video {
-    cursor: pointer;
-    min-width: 0;
-    transition: .2s;
-}
-
-.video:hover {
-    transform: translateY(-4px);
-}
-
-.video img {
-    width: 100%;
-    aspect-ratio: 16/9;
-    object-fit: cover;
-    border-radius: 12px;
-    background: #252525;
-}
-
-.video h3 {
-    font-size: 15px;
-    line-height: 1.5;
-    margin-top: 9px;
-}
-
-.video p {
-    color: #999;
-    font-size: 13px;
-    margin-top: 6px;
-}
-
-/* INVIDIOUS PLAYER */
-
-#playerSection {
-    display: none;
-    margin-bottom: 35px;
-    background: #181818;
-    padding: 15px;
-    border-radius: 14px;
-}
-
-.player-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 13px;
-    gap: 10px;
-}
-
-.player-label {
-    color: #ff4545;
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.close-player {
-    background: #292929;
-    border: none;
-    color: white;
-    padding: 8px 13px;
-    border-radius: 7px;
-    cursor: pointer;
-}
-
-.player {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background: #000;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.player iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-}
-
-#playerTitle {
-    font-size: 21px;
-    margin-top: 16px;
-    line-height: 1.4;
-}
-
-#playerChannel {
-    color: #aaa;
-    margin-top: 9px;
-    font-size: 14px;
-}
-
-.player-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.player-info a {
-    color: #ff5555;
-    font-size: 13px;
-    text-decoration: none;
-}
-
-#more {
-    display: none;
-    margin: 35px auto;
-    padding: 13px 25px;
-    background: #ff3030;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-#more:disabled {
-    opacity: .5;
-}
-
-footer {
-    text-align: center;
-    padding: 25px;
-    color: #777;
-    border-top: 1px solid #292929;
-    font-size: 13px;
-}
-
-@media(max-width:700px) {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KendiTube</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --card: #1a1a1a;
+      --text: #f1f1f1;
+      --muted: #aaa;
+      --accent: #ff0000;
+      --border: #333;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
     header {
-        height: 60px;
-        padding: 0 12px;
-        gap: 12px;
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15,15,15,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex; gap: 12px; align-items: center;
     }
-
-    .logo {
-        font-size: 21px;
+    .logo { font-weight: 700; font-size: 1.25rem; color: var(--accent); white-space: nowrap; }
+    .search-box {
+      flex: 1; display: flex; gap: 8px;
     }
-
-    .layout {
-        grid-template-columns: 1fr;
+    input[type="search"] {
+      flex: 1; padding: 10px 14px; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--card);
+      color: var(--text); font-size: 1rem;
     }
-
-    aside {
-        display: flex;
-        overflow-x: auto;
-        padding: 8px;
-        border-right: none;
-        border-bottom: 1px solid #292929;
+    button {
+      padding: 10px 18px; border-radius: 999px; border: none;
+      background: var(--accent); color: white; font-weight: 600;
+      cursor: pointer;
     }
-
-    aside button {
-        width: auto;
-        white-space: nowrap;
-        padding: 10px;
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    main { max-width: 1200px; margin: 0 auto; padding: 20px 16px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
     }
-
-    main {
-        padding: 15px;
+    .card {
+      background: var(--card); border-radius: 12px; overflow: hidden;
+      cursor: pointer; transition: transform 0.15s;
     }
-
-    .videos {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 15px;
+    .card:hover { transform: translateY(-3px); }
+    .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+    .card-body { padding: 12px; }
+    .card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-meta { font-size: 0.8rem; color: var(--muted); }
+    #player-section { display: none; }
+    #player-section.active { display: block; }
+    .player-wrapper {
+      background: #000; border-radius: 12px; overflow: hidden;
+      margin-bottom: 16px; position: relative;
     }
-
-    .video h3 {
-        font-size: 13px;
-    }
-
-    #playerSection {
-        padding: 9px;
-    }
-
-    #playerTitle {
-        font-size: 17px;
-    }
-}
-
-@media(max-width:380px) {
-    .videos {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
+    video { width: 100%; max-height: 70vh; display: block; background: #000; }
+    .video-info h1 { font-size: 1.35rem; margin-bottom: 8px; }
+    .video-meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 12px; }
+    .desc { white-space: pre-wrap; font-size: 0.95rem; color: #ccc;
+      max-height: 150px; overflow-y: auto; }
+    .back-btn { margin-bottom: 16px; background: var(--card); }
+    .status { text-align: center; padding: 40px; color: var(--muted); }
+    .instance-select { font-size: 0.8rem; color: var(--muted); }
+    select { background: var(--card); color: var(--text); border: 1px solid var(--border);
+      padding: 6px 10px; border-radius: 6px; }
+  </style>
 </head>
-
 <body>
-
-<header>
-    <div class="logo">Erdem<span>Tube</span></div>
-
-    <div class="search">
-        <input
-            id="query"
-            type="search"
-            placeholder="Ne izlemek istiyorsun?"
-            autocomplete="off"
-        >
-        <button onclick="search()">ARA</button>
+  <header>
+    <div class="logo">KendiTube</div>
+    <div class="search-box">
+      <input type="search" id="q" placeholder="Ara..." autocomplete="off" />
+      <button id="searchBtn">Ara</button>
     </div>
-</header>
+    <div class="instance-select">
+      <select id="instance">
+        <option value="https://pipedapi.kavin.rocks">kavin.rocks (resmi)</option>
+        <option value="https://pipedapi.leptons.xyz">leptons.xyz</option>
+        <option value="https://pipedapi.adminforge.de">adminforge.de</option>
+        <option value="https://api.piped.yt">piped.yt</option>
+        <option value="https://pipedapi.drgns.space">drgns.space</option>
+      </select>
+    </div>
+  </header>
 
-<div class="layout">
+  <main>
+    <div id="home">
+      <div id="status" class="status">Aramak için yukarıya yaz...</div>
+      <div id="results" class="grid"></div>
+    </div>
 
-<aside>
-    <button class="active" onclick="home(this)">🏠 Ana Sayfa</button>
-    <button onclick="category('müzik',this)">🎵 Müzik</button>
-    <button onclick="category('oyun',this)">🎮 Oyun</button>
-    <button onclick="category('teknoloji',this)">💻 Teknoloji</button>
-    <button onclick="category('komedi',this)">😂 Komedi</button>
-    <button onclick="category('eğitim',this)">📚 Eğitim</button>
-    <button onclick="category('spor',this)">⚽ Spor</button>
-    <button onclick="category('belgesel',this)">🌍 Belgesel</button>
-</aside>
+    <div id="player-section">
+      <button class="back-btn" id="backBtn">← Geri</button>
+      <div class="player-wrapper">
+        <video id="player" controls playsinline></video>
+      </div>
+      <div class="video-info">
+        <h1 id="v-title"></h1>
+        <div class="video-meta" id="v-meta"></div>
+        <div class="desc" id="v-desc"></div>
+      </div>
+    </div>
+  </main>
 
-<main>
+  <script>
+    const $ = s => document.querySelector(s);
+    const resultsEl = $('#results');
+    const statusEl = $('#status');
+    const player = $('#player');
+    const home = $('#home');
+    const playerSection = $('#player-section');
 
-    <!-- INVIDIOUS VIDEO PLAYER -->
+    let currentInstance = $('#instance').value;
 
-    <section id="playerSection">
-
-        <div class="player-header">
-            <span class="player-label">
-                ● ERDEMTUBE INVIDIOUS PLAYER
-            </span>
-
-            <button class="close-player" onclick="closePlayer()">
-                ✕ Kapat
-            </button>
-        </div>
-
-        <div class="player">
-            <iframe
-                id="player"
-                title="ErdemTube Invidious Video Player"
-                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                allowfullscreen
-                referrerpolicy="no-referrer">
-            </iframe>
-        </div>
-
-        <h2 id="playerTitle"></h2>
-
-        <div class="player-info">
-            <p id="playerChannel"></p>
-
-            <a id="instanceLink"
-               href="https://invidious.tiekoetter.com"
-               target="_blank"
-               rel="noopener noreferrer">
-               Invidious sunucusu ↗
-            </a>
-        </div>
-
-    </section>
-
-    <h2 id="heading">ErdemTube'a Hoş Geldin 👋</h2>
-
-    <p id="status">Videolar yükleniyor...</p>
-
-    <div class="videos" id="videos"></div>
-
-    <button id="more" onclick="loadMore()">
-        Daha Fazla Video Yükle
-    </button>
-
-</main>
-</div>
-
-<footer>
-    © 2026 ErdemTube | Independent Video Experience
-</footer>
-
-<script>
-
-// ======================================
-// ERDEMTUBE API AYARLARI
-// ======================================
-
-// YouTube API Key'ini buraya yaz.
-
-const API_KEY = "AIzaSyAqZ0dcg7MPQmeN3YoNbcpo7fMBg-Q8Wzs";
-
-// Invidious sunucusu.
-// Resmî listede bulunan bir alternatifle değiştirebilirsin.
-
-const INVIDIOUS_INSTANCE = "https://invidious.tiekoetter.com";
-
-// Diğer resmî listelenmiş alternatifler:
-//
-// https://inv.nadeko.net
-// https://invidious.nerdvpn.de
-// https://yt.chocolatemoo53.com
-// https://invidious.f5.si
-// https://inv.miningtcup.me
-
-// ======================================
-
-let nextToken = "";
-let lastQuery = "";
-let busy = false;
-
-const $ = id => document.getElementById(id);
-
-
-// ANA SAYFA
-
-function home(button) {
-    setActive(button);
-    $("query").value = "";
-    closePlayer();
-    searchVideos("Türkiye popüler videolar");
-}
-
-
-// KATEGORİLER
-
-function category(name, button) {
-    setActive(button);
-    $("query").value = name;
-    closePlayer();
-    searchVideos(name);
-}
-
-
-// AKTİF MENÜ
-
-function setActive(button) {
-    document.querySelectorAll("aside button").forEach(btn => {
-        btn.classList.remove("active");
+    $('#instance').addEventListener('change', e => {
+      currentInstance = e.target.value;
     });
 
-    if(button) button.classList.add("active");
-}
-
-
-// ARAMA
-
-function search() {
-    const q = $("query").value.trim();
-
-    if (!q) {
-        alert("Aramak istediğin videoyu yaz!");
-        return;
+    async function api(path) {
+      const url = currentInstance.replace(/\/$/, '') + path;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`API hatası: ${res.status}`);
+      return res.json();
     }
 
-    closePlayer();
-    searchVideos(q);
-}
-
-$("query").addEventListener("keydown", e => {
-    if (e.key === "Enter") search();
-});
-
-
-// YOUTUBE API ARAMA
-
-async function searchVideos(query, more = false) {
-
-    if (!API_KEY || API_KEY === "BURAYA_API_KEYINI_YAZ") {
-        $("status").textContent =
-            "HTML dosyasındaki API_KEY alanına kendi anahtarını yazmalısın.";
-        return;
+    function formatDuration(sec) {
+      if (!sec) return '';
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return h > 0
+        ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+        : `${m}:${String(s).padStart(2,'0')}`;
     }
 
-    if (busy) return;
-
-    if (!more) {
-        lastQuery = query;
-        nextToken = "";
-        $("videos").innerHTML = "";
-        $("heading").textContent = '"' + query + '" sonuçları';
+    function formatViews(n) {
+      if (!n) return '';
+      if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M görüntüleme';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'B görüntüleme';
+      return n + ' görüntüleme';
     }
 
-    busy = true;
+    async function search(q) {
+      if (!q.trim()) return;
+      statusEl.textContent = 'Aranıyor...';
+      resultsEl.innerHTML = '';
+      home.style.display = 'block';
+      playerSection.classList.remove('active');
 
-    $("status").textContent = "Videolar aranıyor...";
-    $("more").style.display = "none";
+      try {
+        // filter=videos sadece video sonuçları getirir
+        const data = await api(`/search?q=${encodeURIComponent(q)}&filter=videos`);
+        const items = data.items || [];
 
-    try {
+        if (items.length === 0) {
+          statusEl.textContent = 'Sonuç bulunamadı.';
+          return;
+        }
 
-        const params = new URLSearchParams({
-            part: "snippet",
-            q: query,
-            type: "video",
-            maxResults: "24",
-            regionCode: "TR",
-            relevanceLanguage: "tr",
-            key: API_KEY
+        statusEl.textContent = '';
+        items.forEach(item => {
+          if (item.type !== 'stream' && !item.url) return; // sadece video
+
+          const id = (item.url || '').split('v=')[1] || item.url?.split('/').pop();
+          if (!id) return;
+
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${item.thumbnail || ''}" alt="" loading="lazy" />
+            <div class="card-body">
+              <div class="card-title">${item.title || ''}</div>
+              <div class="card-meta">
+                ${item.uploader || ''} · ${formatViews(item.views)} · ${item.uploadedDate || ''}
+                ${item.duration ? ' · ' + formatDuration(item.duration) : ''}
+              </div>
+            </div>
+          `;
+          card.onclick = () => playVideo(id);
+          resultsEl.appendChild(card);
         });
-
-        if (more && nextToken) {
-            params.set("pageToken", nextToken);
-        }
-
-        const response = await fetch(
-            "https://www.googleapis.com/youtube/v3/search?" +
-            params.toString()
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                data.error?.message || "YouTube API hatası"
-            );
-        }
-
-        nextToken = data.nextPageToken || "";
-
-        if (!data.items || data.items.length === 0) {
-            $("status").textContent = "Video bulunamadı.";
-            return;
-        }
-
-        data.items.forEach(item => {
-
-            const videoId = item.id.videoId;
-            const snippet = item.snippet;
-
-            if (!videoId) return;
-
-            const card = document.createElement("article");
-            card.className = "video";
-
-            const img = document.createElement("img");
-
-            img.src =
-                snippet.thumbnails.high?.url ||
-                snippet.thumbnails.medium?.url ||
-                snippet.thumbnails.default?.url;
-
-            img.alt = snippet.title;
-            img.loading = "lazy";
-
-            const title = document.createElement("h3");
-            title.textContent = snippet.title;
-
-            const channel = document.createElement("p");
-            channel.textContent = snippet.channelTitle;
-
-            const date = document.createElement("p");
-            date.textContent = new Date(
-                snippet.publishedAt
-            ).toLocaleDateString("tr-TR");
-
-            card.append(img, title, channel, date);
-
-            card.addEventListener("click", () => {
-                playVideo(
-                    videoId,
-                    snippet.title,
-                    snippet.channelTitle
-                );
-            });
-
-            $("videos").appendChild(card);
-
-        });
-
-        $("status").textContent =
-            data.items.length + " yeni video bulundu!";
-
-        $("more").style.display =
-            nextToken ? "block" : "none";
-
-    } catch(error) {
-
-        console.error(error);
-
-        $("status").textContent =
-            "Arama hatası: " + error.message;
-
-    } finally {
-        busy = false;
+      } catch (err) {
+        statusEl.textContent = 'Hata: ' + err.message + ' — Instance değiştirip tekrar dene.';
+        console.error(err);
+      }
     }
-}
 
+    async function playVideo(videoId) {
+      statusEl.textContent = 'Video yükleniyor...';
+      home.style.display = 'none';
+      playerSection.classList.add('active');
+      player.removeAttribute('src');
+      player.load();
 
-// INVIDIOUS OYNATICI
+      try {
+        const data = await api(`/streams/${videoId}`);
 
-function playVideo(id, title, channel) {
+        $('#v-title').textContent = data.title || '';
+        $('#v-meta').textContent = `${data.uploader || ''} · ${formatViews(data.views)} · ${data.uploadDate || ''}`;
+        $('#v-desc').textContent = data.description || '';
 
-    const base = INVIDIOUS_INSTANCE.replace(/\/+$/, "");
+        // En iyi progressive stream'i seç (videoOnly=false tercih)
+        let stream = null;
+        const streams = data.videoStreams || [];
 
-    const playerURL =
-        base +
-        "/embed/" +
-        encodeURIComponent(id) +
-        "?autoplay=1&controls=1&dark_mode=true&player_style=invidious";
+        // Önce ses+görüntü birleşik olanları dene (düşük kalite olsa bile)
+        const combined = streams
+          .filter(s => !s.videoOnly && s.mimeType?.includes('mp4'))
+          .sort((a, b) => (b.height || 0) - (a.height || 0));
 
-    $("player").src = playerURL;
+        if (combined.length) {
+          stream = combined[0];
+        } else {
+          // Yoksa en yüksek çözünürlüklü videoOnly (ses ayrı olacak ama basit tutuyoruz)
+          const videoOnly = streams
+            .filter(s => s.mimeType?.includes('mp4'))
+            .sort((a, b) => (b.height || 0) - (a.height || 0));
+          if (videoOnly.length) stream = videoOnly[0];
+        }
 
-    $("playerTitle").textContent = title;
-    $("playerChannel").textContent = channel;
+        // HLS varsa (livestream veya bazı videolar) onu tercih et
+        if (data.hls) {
+          // Basit çözüm: HLS destekleyen tarayıcılar için
+          // Daha iyi deneyim için HLS.js eklenebilir ama tek dosya için native deniyoruz
+          player.src = data.hls;
+        } else if (stream?.url) {
+          player.src = stream.url;
+        } else {
+          throw new Error('Uygun stream bulunamadı');
+        }
 
-    $("instanceLink").href = base + "/watch?v=" +
-        encodeURIComponent(id);
+        player.play().catch(() => {});
+        statusEl.textContent = '';
+      } catch (err) {
+        statusEl.textContent = 'Video açılamadı: ' + err.message;
+        console.error(err);
+      }
+    }
 
-    $("playerSection").style.display = "block";
-
-    $("playerSection").scrollIntoView({
-        behavior: "smooth",
-        block: "start"
+    $('#searchBtn').onclick = () => search($('#q').value);
+    $('#q').addEventListener('keydown', e => {
+      if (e.key === 'Enter') search($('#q').value);
     });
-}
+    $('#backBtn').onclick = () => {
+      player.pause();
+      player.removeAttribute('src');
+      playerSection.classList.remove('active');
+      home.style.display = 'block';
+    };
 
-
-// OYNATICIYI KAPAT
-
-function closePlayer() {
-
-    $("player").src = "";
-
-    $("playerSection").style.display = "none";
-}
-
-
-// DAHA FAZLA VİDEO
-
-function loadMore() {
-
-    if (nextToken) {
-        searchVideos(lastQuery, true);
-    }
-}
-
-
-// İLK AÇILIŞ
-
-window.addEventListener("load", () => {
-
-    searchVideos("@yapayzeka_gundemi");
-
-});
-
-
-// SAYFADAN ÇIKARKEN VİDEOYU DURDUR
-
-window.addEventListener("pagehide", () => {
-    $("player").src = "";
-});
-
-</script>
-
+    // İlk açılışta trending (isteğe bağlı)
+    // search(' '); // boş bırakıyorum, kullanıcı arasın
+  </script>
 </body>
 </html>
