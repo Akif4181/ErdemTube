@@ -4,30 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ErdemTube</title>
-
-  <!-- Plyr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-
   <style>
     :root {
       --bg: #0f0f0f;
-      --card: #1c1c1c;
+      --card: #1a1a1a;
       --text: #f1f1f1;
       --muted: #aaa;
       --accent: #ff0000;
-      --border: #333;
-      --header: rgba(15,15,15,0.92);
+      --border: #2a2a2a;
+      --header: rgba(15,15,15,0.94);
     }
     [data-theme="light"] {
-      --bg: #f5f5f5;
-      --card: #ffffff;
+      --bg: #f4f4f4;
+      --card: #fff;
       --text: #111;
-      --muted: #555;
+      --muted: #666;
       --accent: #cc0000;
-      --border: #ddd;
-      --header: rgba(255,255,255,0.92);
+      --border: #e0e0e0;
+      --header: rgba(255,255,255,0.94);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -36,136 +32,143 @@
       line-height: 1.45;
       min-height: 100vh;
     }
-
     header {
       position: sticky; top: 0; z-index: 100;
       background: var(--header);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
-      padding: 10px 16px;
+      padding: 11px 18px;
       display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
     }
     .logo {
-      font-weight: 800; font-size: 1.3rem; color: var(--accent);
-      cursor: pointer; white-space: nowrap;
+      font-weight: 800; font-size: 1.35rem; color: var(--accent);
+      cursor: pointer; letter-spacing: -0.5px;
     }
-    .search-box { flex: 1; min-width: 200px; display: flex; gap: 8px; }
+    .search-box { flex: 1; min-width: 220px; display: flex; gap: 8px; }
     input[type="search"] {
-      flex: 1; padding: 10px 16px; border-radius: 999px;
+      flex: 1; padding: 11px 18px; border-radius: 999px;
       border: 1px solid var(--border); background: var(--card);
       color: var(--text); font-size: 1rem;
     }
     button, .btn {
-      padding: 9px 16px; border-radius: 999px; border: none;
-      background: var(--accent); color: white; font-weight: 600;
+      padding: 10px 18px; border-radius: 999px; border: none;
+      background: var(--accent); color: #fff; font-weight: 600;
       cursor: pointer; font-size: 0.95rem;
     }
-    button:disabled { opacity: 0.45; cursor: not-allowed; }
     .icon-btn {
       background: var(--card); color: var(--text);
-      border: 1px solid var(--border); width: 40px; height: 40px;
+      border: 1px solid var(--border); width: 42px; height: 42px;
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1.15rem; cursor: pointer;
     }
     select {
       background: var(--card); color: var(--text);
-      border: 1px solid var(--border); padding: 8px 10px;
-      border-radius: 8px; font-size: 0.85rem;
+      border: 1px solid var(--border); padding: 9px 12px;
+      border-radius: 10px; font-size: 0.85rem;
     }
-
-    main { max-width: 1280px; margin: 0 auto; padding: 20px 16px 60px; }
+    main { max-width: 1320px; margin: 0 auto; padding: 22px 18px 70px; }
 
     .section-title {
-      font-size: 1.15rem; font-weight: 700; margin: 24px 0 14px;
-      display: flex; align-items: center; gap: 8px;
+      font-size: 1.2rem; font-weight: 700; margin: 28px 0 16px;
+      display: flex; align-items: center; gap: 10px;
     }
-
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 20px;
     }
     .card {
-      background: var(--card); border-radius: 12px; overflow: hidden;
-      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+      background: var(--card); border-radius: 14px; overflow: hidden;
+      cursor: pointer; transition: transform 0.18s, box-shadow 0.18s;
       border: 1px solid transparent;
     }
-    .card:hover { transform: translateY(-4px); border-color: var(--border); }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
     .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #222; }
-    .card-body { padding: 11px 13px 14px; }
+    .card-body { padding: 12px 14px 15px; }
     .card-title {
-      font-size: 0.92rem; font-weight: 600; margin-bottom: 5px;
+      font-size: 0.95rem; font-weight: 600; margin-bottom: 6px;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .card-meta { font-size: 0.78rem; color: var(--muted); }
+    .card-meta { font-size: 0.8rem; color: var(--muted); }
 
-    /* Player */
     #player-view { display: none; }
     #player-view.active { display: block; }
     .player-layout {
       display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 24px;
+      grid-template-columns: 1fr 360px;
+      gap: 28px;
     }
-    @media (max-width: 960px) {
+    @media (max-width: 1000px) {
       .player-layout { grid-template-columns: 1fr; }
     }
-    .player-main { min-width: 0; }
     .player-wrapper {
-      background: #000; border-radius: 12px; overflow: hidden;
-      margin-bottom: 16px;
+      background: #000; border-radius: 14px; overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
     }
-    .plyr { --plyr-color-main: #ff0000; }
-    .video-title { font-size: 1.35rem; font-weight: 700; margin-bottom: 6px; }
-    .video-meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 12px; }
+    .plyr { --plyr-color-main: #ff0000; border-radius: 14px; }
+    .video-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .video-meta { color: var(--muted); font-size: 0.92rem; margin-bottom: 14px; }
     .desc {
-      white-space: pre-wrap; font-size: 0.93rem; color: var(--muted);
-      max-height: 160px; overflow-y: auto; background: var(--card);
-      padding: 12px; border-radius: 10px; margin-bottom: 18px;
+      white-space: pre-wrap; font-size: 0.94rem; color: var(--muted);
+      max-height: 180px; overflow-y: auto; background: var(--card);
+      padding: 14px; border-radius: 12px; margin-bottom: 20px;
+      border: 1px solid var(--border);
     }
     .quality-bar {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
       align-items: center;
     }
-    .quality-bar span { font-size: 0.85rem; color: var(--muted); margin-right: 4px; }
+    .quality-bar span { font-size: 0.85rem; color: var(--muted); }
     .q-btn {
-      padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border);
+      padding: 6px 13px; border-radius: 8px; border: 1px solid var(--border);
       background: var(--card); color: var(--text); font-size: 0.82rem; cursor: pointer;
+      transition: 0.15s;
     }
+    .q-btn:hover { border-color: var(--accent); }
     .q-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-    .related { max-height: 80vh; overflow-y: auto; }
-    .related .card { margin-bottom: 12px; }
+    .related { max-height: 85vh; overflow-y: auto; padding-right: 6px; }
+    .related .card { margin-bottom: 14px; }
 
-    .status { text-align: center; padding: 50px 20px; color: var(--muted); }
-    .back-btn { margin-bottom: 16px; background: var(--card); color: var(--text); border: 1px solid var(--border); }
-
+    .status { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 1.05rem; }
+    .back-btn {
+      margin-bottom: 18px; background: var(--card); color: var(--text);
+      border: 1px solid var(--border);
+    }
     .history-clear {
       font-size: 0.8rem; background: transparent; color: var(--muted);
-      border: 1px solid var(--border); padding: 4px 10px;
+      border: 1px solid var(--border); padding: 5px 12px;
+    }
+    .api-warning {
+      background: #3a1a1a; color: #ffb4b4; padding: 12px 16px;
+      border-radius: 10px; margin-bottom: 20px; font-size: 0.9rem;
+      border: 1px solid #5a2a2a; display: none;
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo" id="logo">KendiTube</div>
+    <div class="logo" id="logo">ErdemTube</div>
     <div class="search-box">
-      <input type="search" id="q" placeholder="Video ara..." autocomplete="off" />
+      <input type="search" id="q" placeholder="YouTube'da ara..." autocomplete="off" />
       <button id="searchBtn">Ara</button>
     </div>
-    <select id="instance" title="Piped Instance">
+    <select id="instance" title="Stream kaynağı (Piped)">
       <option value="https://pipedapi.kavin.rocks">kavin.rocks</option>
       <option value="https://pipedapi.leptons.xyz">leptons.xyz</option>
       <option value="https://pipedapi.adminforge.de">adminforge</option>
       <option value="https://api.piped.yt">piped.yt</option>
       <option value="https://pipedapi.drgns.space">drgns.space</option>
-      <option value="https://pipedapi.ducks.party">ducks.party</option>
     </select>
     <button class="icon-btn" id="themeBtn" title="Tema">🌓</button>
   </header>
 
   <main>
-    <!-- Ana sayfa -->
+    <div class="api-warning" id="apiWarning">
+      YouTube API anahtarı girilmemiş! Kodun içindeki <b>YT_API_KEY</b> kısmına kendi anahtarını yaz.
+    </div>
+
     <div id="home">
       <div id="status" class="status">Yükleniyor...</div>
 
@@ -177,7 +180,7 @@
         <div id="history" class="grid"></div>
       </div>
 
-      <div class="section-title">Trend</div>
+      <div class="section-title">Türkiye Trendleri</div>
       <div id="trending" class="grid"></div>
 
       <div id="search-results-section" style="display:none;">
@@ -186,7 +189,6 @@
       </div>
     </div>
 
-    <!-- Player sayfası -->
     <div id="player-view">
       <button class="back-btn" id="backBtn">← Geri</button>
       <div class="player-layout">
@@ -202,24 +204,27 @@
           <div class="desc" id="v-desc"></div>
         </div>
         <div class="related">
-          <div class="section-title">İlgili Videolar</div>
+          <div class="section-title">Önerilenler</div>
           <div id="related" class="grid" style="grid-template-columns:1fr;"></div>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
   <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
 
   <script>
-    // ========== AYARLAR ==========
-    const HISTORY_KEY = 'kenditube_history';
-    const THEME_KEY = 'kenditube_theme';
-    const MAX_HISTORY = 24;
+    // ============================================================
+    //  BURAYA KENDİ YOUTUBE DATA API v3 ANAHTARINI YAZ
+    // ============================================================
+    const YT_API_KEY = 'AIzaSyAqZ0dcg7MPQmeN3YoNbcpo7fMBg-Q8Wzs';   // <-- burayı değiştir
+    // ============================================================
 
-    // ========== DOM ==========
+    const HISTORY_KEY = 'erdemtube_history';
+    const THEME_KEY = 'erdemtube_theme';
+    const MAX_HISTORY = 30;
+
     const $ = s => document.querySelector(s);
     const home = $('#home');
     const playerView = $('#player-view');
@@ -230,84 +235,100 @@
     const relatedEl = $('#related');
     const qualityBar = $('#qualityBar');
     const videoEl = $('#player');
+    const apiWarning = $('#apiWarning');
 
     let currentInstance = $('#instance').value;
     let plyrInstance = null;
     let hlsInstance = null;
-    let currentStreams = [];
 
-    // ========== TEMA ==========
-    function applyTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem(THEME_KEY, theme);
+    // Tema
+    function applyTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem(THEME_KEY, t);
     }
-    const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
-    applyTheme(savedTheme);
+    applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
     $('#themeBtn').onclick = () => {
       const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       applyTheme(next);
     };
 
-    // ========== INSTANCE ==========
-    $('#instance').onchange = e => { currentInstance = e.target.value; };
+    $('#instance').onchange = e => currentInstance = e.target.value;
 
-    // ========== API ==========
-    async function api(path) {
+    // ========== YOUTUBE DATA API ==========
+    async function ytApi(endpoint, params = {}) {
+      if (!YT_API_KEY || YT_API_KEY === 'BURAYA_API_KEY_YAZ') {
+        apiWarning.style.display = 'block';
+        throw new Error('YouTube API anahtarı girilmemiş');
+      }
+      const url = new URL(`https://www.googleapis.com/youtube/v3/${endpoint}`);
+      url.searchParams.set('key', YT_API_KEY);
+      Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message || 'YT API hatası');
+      return data;
+    }
+
+    // ========== PIPED (sadece stream için) ==========
+    async function getStreams(videoId) {
       const base = currentInstance.replace(/\/$/, '');
-      const res = await fetch(base + path);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await fetch(`${base}/streams/${videoId}`);
+      if (!res.ok) throw new Error(`Stream alınamadı (${res.status})`);
       return res.json();
     }
 
-    // ========== YARDIMCILAR ==========
+    // Yardımcılar
     function formatDuration(sec) {
       if (!sec && sec !== 0) return '';
       const h = Math.floor(sec / 3600);
       const m = Math.floor((sec % 3600) / 60);
       const s = Math.floor(sec % 60);
-      return h > 0
-        ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-        : `${m}:${String(s).padStart(2,'0')}`;
+      return h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`;
     }
     function formatViews(n) {
       if (!n) return '';
-      if (n >= 1e6) return (n/1e6).toFixed(1).replace('.0','') + 'M';
-      if (n >= 1e3) return (n/1e3).toFixed(1).replace('.0','') + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(1).replace('.0','') + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1).replace('.0','') + 'B';
       return n + '';
     }
-    function extractId(url) {
-      if (!url) return null;
-      const m = url.match(/[?&]v=([^&]+)/) || url.match(/\/([a-zA-Z0-9_-]{11})(?:\?|$)/);
-      return m ? m[1] : null;
+    function parseISODuration(iso) {
+      if (!iso) return 0;
+      const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+      if (!m) return 0;
+      return (parseInt(m[1]||0)*3600) + (parseInt(m[2]||0)*60) + parseInt(m[3]||0);
     }
 
-    // ========== KART OLUŞTUR ==========
-    function createCard(item, isHistory = false) {
-      const id = item.videoId || extractId(item.url) || item.url;
+    // Kart oluşturucu
+    function createCardFromYT(item) {
+      const id = item.id?.videoId || item.id;
       if (!id) return null;
+      const sn = item.snippet || {};
+      const thumbs = sn.thumbnails || {};
+      const thumb = thumbs.maxres?.url || thumbs.high?.url || thumbs.medium?.url || thumbs.default?.url || '';
 
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
-        <img src="${item.thumbnail || item.thumbnailUrl || ''}" alt="" loading="lazy" />
+        <img src="${thumb}" alt="" loading="lazy" />
         <div class="card-body">
-          <div class="card-title">${item.title || ''}</div>
+          <div class="card-title">${sn.title || ''}</div>
           <div class="card-meta">
-            ${item.uploader || item.uploaderName || ''}
-            ${item.views ? ' · ' + formatViews(item.views) : ''}
-            ${item.uploadedDate || item.uploaded ? ' · ' + (item.uploadedDate || '') : ''}
-            ${item.duration ? ' · ' + formatDuration(item.duration) : ''}
+            ${sn.channelTitle || ''}
+            ${item.statistics?.viewCount ? ' · ' + formatViews(item.statistics.viewCount) : ''}
           </div>
         </div>
       `;
-      card.onclick = () => playVideo(id, item);
+      card.onclick = () => playVideo(id, {
+        title: sn.title,
+        channelTitle: sn.channelTitle,
+        thumb
+      });
       return card;
     }
 
-    // ========== GEÇMİŞ ==========
+    // Geçmiş
     function getHistory() {
-      try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
-      catch { return []; }
+      try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
     }
     function saveToHistory(video) {
       let hist = getHistory().filter(v => v.videoId !== video.videoId);
@@ -319,13 +340,21 @@
     function renderHistory() {
       const hist = getHistory();
       historyEl.innerHTML = '';
-      if (hist.length === 0) {
+      if (!hist.length) {
         $('#history-section').style.display = 'none';
         return;
       }
       $('#history-section').style.display = 'block';
       hist.forEach(item => {
-        const c = createCard(item, true);
+        const fakeItem = {
+          id: item.videoId,
+          snippet: {
+            title: item.title,
+            channelTitle: item.channelTitle,
+            thumbnails: { medium: { url: item.thumb } }
+          }
+        };
+        const c = createCardFromYT(fakeItem);
         if (c) historyEl.appendChild(c);
       });
     }
@@ -334,23 +363,28 @@
       renderHistory();
     };
 
-    // ========== TRENDING ==========
+    // Trend
     async function loadTrending() {
       statusEl.textContent = 'Trend videolar yükleniyor...';
       try {
-        const data = await api('/trending?region=TR');
+        const data = await ytApi('videos', {
+          part: 'snippet,statistics,contentDetails',
+          chart: 'mostPopular',
+          regionCode: 'TR',
+          maxResults: 24
+        });
         trendingEl.innerHTML = '';
-        (data || []).slice(0, 24).forEach(item => {
-          const c = createCard(item);
+        (data.items || []).forEach(item => {
+          const c = createCardFromYT(item);
           if (c) trendingEl.appendChild(c);
         });
         statusEl.textContent = '';
       } catch (err) {
-        statusEl.textContent = 'Trend yüklenemedi. Instance değiştirip sayfayı yenile. (' + err.message + ')';
+        statusEl.textContent = 'Trend yüklenemedi: ' + err.message;
       }
     }
 
-    // ========== ARAMA ==========
+    // Arama
     async function search(q) {
       if (!q.trim()) return;
       statusEl.textContent = 'Aranıyor...';
@@ -360,15 +394,20 @@
       playerView.classList.remove('active');
 
       try {
-        const data = await api(`/search?q=${encodeURIComponent(q)}&filter=videos`);
-        const items = data.items || [];
-        if (items.length === 0) {
+        const data = await ytApi('search', {
+          part: 'snippet',
+          q: q,
+          type: 'video',
+          maxResults: 24,
+          order: 'relevance'
+        });
+        if (!data.items?.length) {
           statusEl.textContent = 'Sonuç bulunamadı.';
           return;
         }
         statusEl.textContent = '';
-        items.forEach(item => {
-          const c = createCard(item);
+        data.items.forEach(item => {
+          const c = createCardFromYT(item);
           if (c) resultsEl.appendChild(c);
         });
       } catch (err) {
@@ -376,72 +415,77 @@
       }
     }
 
-    // ========== PLAYER ==========
+    // Player temizle
     function destroyPlayer() {
-      if (hlsInstance) {
-        hlsInstance.destroy();
-        hlsInstance = null;
-      }
-      if (plyrInstance) {
-        plyrInstance.destroy();
-        plyrInstance = null;
-      }
+      if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+      if (plyrInstance) { plyrInstance.destroy(); plyrInstance = null; }
       videoEl.removeAttribute('src');
       videoEl.load();
       qualityBar.style.display = 'none';
       qualityBar.innerHTML = '<span>Kalite:</span>';
     }
 
+    // Oynatma
     async function playVideo(videoId, meta = {}) {
       destroyPlayer();
       home.style.display = 'none';
       playerView.classList.add('active');
-      statusEl.textContent = '';
 
       $('#v-title').textContent = meta.title || 'Yükleniyor...';
-      $('#v-meta').textContent = '';
+      $('#v-meta').textContent = meta.channelTitle || '';
       $('#v-desc').textContent = '';
       relatedEl.innerHTML = '';
 
       try {
-        const data = await api(`/streams/${videoId}`);
-
-        // Bilgileri doldur
-        $('#v-title').textContent = data.title || '';
-        $('#v-meta').textContent = `${data.uploader || ''} · ${formatViews(data.views)} görüntüleme · ${data.uploadDate || ''}`;
-        $('#v-desc').textContent = data.description || '';
-
-        // Geçmişe ekle
-        saveToHistory({
-          videoId,
-          title: data.title,
-          thumbnail: data.thumbnailUrl,
-          uploader: data.uploader,
-          views: data.views,
-          duration: data.duration,
-          uploadedDate: data.uploadDate
+        // Video detayları (YouTube API)
+        const details = await ytApi('videos', {
+          part: 'snippet,statistics,contentDetails',
+          id: videoId
         });
+        const video = details.items?.[0];
+        if (video) {
+          const sn = video.snippet;
+          $('#v-title').textContent = sn.title;
+          $('#v-meta').textContent = `${sn.channelTitle} · ${formatViews(video.statistics?.viewCount)} görüntüleme · ${formatDuration(parseISODuration(video.contentDetails?.duration))}`;
+          $('#v-desc').textContent = sn.description || '';
 
-        // İlgili videolar
-        relatedEl.innerHTML = '';
-        (data.relatedStreams || []).slice(0, 15).forEach(item => {
-          const c = createCard(item);
-          if (c) relatedEl.appendChild(c);
-        });
+          saveToHistory({
+            videoId,
+            title: sn.title,
+            channelTitle: sn.channelTitle,
+            thumb: sn.thumbnails?.medium?.url || sn.thumbnails?.default?.url
+          });
+        }
 
-        // ===== OYNATICI SEÇİMİ =====
-        currentStreams = data.videoStreams || [];
+        // Önerilenler (YouTube API)
+        try {
+          const related = await ytApi('search', {
+            part: 'snippet',
+            relatedToVideoId: videoId,
+            type: 'video',
+            maxResults: 16
+          });
+          relatedEl.innerHTML = '';
+          (related.items || []).forEach(item => {
+            const c = createCardFromYT(item);
+            if (c) relatedEl.appendChild(c);
+          });
+        } catch (e) {
+          console.warn('Related alınamadı', e);
+        }
 
-        // 1) HLS varsa (canlı veya adaptive) → HLS.js + Plyr
-        if (data.hls && Hls.isSupported()) {
-          hlsInstance = new Hls({ enableWorker: true });
-          hlsInstance.loadSource(data.hls);
+        // Stream (Piped) → kendi player
+        const streamData = await getStreams(videoId);
+
+        if (streamData.hls && Hls.isSupported()) {
+          hlsInstance = new Hls({ enableWorker: true, maxBufferLength: 30 });
+          hlsInstance.loadSource(streamData.hls);
           hlsInstance.attachMedia(videoEl);
 
           hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
             const levels = hlsInstance.levels;
             const qualities = levels.map(l => l.height).filter(Boolean);
-            qualities.unshift(0); // Auto
+            qualities.unshift(0);
 
             plyrInstance = new Plyr(videoEl, {
               quality: {
@@ -456,26 +500,21 @@
                   }
                 }
               },
-              i18n: { qualityLabel: { 0: 'Otomatik' } }
+              i18n: { qualityLabel: { 0: 'Otomatik' } },
+              keyboard: { focused: true, global: true }
             });
             videoEl.play().catch(() => {});
           });
-        }
-        // 2) Progressive stream'ler
-        else {
-          // Önce ses+görüntü birleşik olanları tercih et
-          let candidates = currentStreams
-            .filter(s => s.mimeType && s.mimeType.includes('mp4'))
+        } else {
+          let candidates = (streamData.videoStreams || [])
+            .filter(s => s.mimeType?.includes('mp4'))
             .sort((a, b) => (b.height || 0) - (a.height || 0));
 
           const combined = candidates.filter(s => !s.videoOnly);
           if (combined.length) candidates = combined;
 
-          if (candidates.length === 0) {
-            throw new Error('Oynatılabilir stream bulunamadı');
-          }
+          if (!candidates.length) throw new Error('Uygun video stream bulunamadı');
 
-          // Plyr'a multiple source ver (kalite seçici çıkar)
           const sources = candidates.map(s => ({
             src: s.url,
             type: s.mimeType || 'video/mp4',
@@ -487,21 +526,21 @@
               default: sources[0].size,
               options: sources.map(s => s.size),
               forced: true
-            }
+            },
+            keyboard: { focused: true, global: true }
           });
 
           plyrInstance.source = {
             type: 'video',
-            title: data.title,
-            sources: sources
+            title: meta.title || '',
+            sources
           };
 
-          // Kalite butonları da ekle (ekstra)
           qualityBar.style.display = 'flex';
           candidates.forEach((s, i) => {
             const btn = document.createElement('button');
             btn.className = 'q-btn' + (i === 0 ? ' active' : '');
-            btn.textContent = (s.quality || (s.height + 'p')) + (s.videoOnly ? ' (video)' : '');
+            btn.textContent = s.quality || (s.height + 'p');
             btn.onclick = () => {
               document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
               btn.classList.add('active');
@@ -516,17 +555,15 @@
           videoEl.play().catch(() => {});
         }
       } catch (err) {
-        $('#v-title').textContent = 'Hata';
-        $('#v-desc').textContent = err.message + '\n\nFarklı bir instance seçip tekrar dene.';
+        $('#v-title').textContent = 'Hata oluştu';
+        $('#v-desc').textContent = err.message + '\n\nFarklı bir Piped instance seçip tekrar dene.';
         console.error(err);
       }
     }
 
-    // ========== EVENTLER ==========
+    // Eventler
     $('#searchBtn').onclick = () => search($('#q').value);
-    $('#q').addEventListener('keydown', e => {
-      if (e.key === 'Enter') search($('#q').value);
-    });
+    $('#q').addEventListener('keydown', e => { if (e.key === 'Enter') search($('#q').value); });
     $('#backBtn').onclick = () => {
       destroyPlayer();
       playerView.classList.remove('active');
@@ -540,9 +577,14 @@
       $('#q').value = '';
     };
 
-    // Başlangıç
-    renderHistory();
-    loadTrending();
+    // Başlat
+    if (!YT_API_KEY || YT_API_KEY === 'BURAYA_API_KEY_YAZ') {
+      apiWarning.style.display = 'block';
+      statusEl.textContent = 'Önce YouTube API anahtarını koda ekle.';
+    } else {
+      renderHistory();
+      loadTrending();
+    }
   </script>
 </body>
 </html>
